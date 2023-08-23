@@ -195,46 +195,95 @@ class App(ctk.CTk):
     def salji(self):
         if self.algoVar1.get() == 0: #ovo je za TripleDes
             print("Triple")
-            hashed = sha1_hash(self.porukazas)
-            password = self.loz1.get()
             podaci = self.izaberiKljuc()
-            podaci1 = self.izaberiKljuc1()
-            self.PKSign = RSA.import_private_key(podaci[4], password)  # teba da se doda pasvord da se salje
-            signature = RSA.sign_message(hashed, self.PKSign)
-            firstPart = (signature, self.porukazas)
-            Zipped = ZIP.zip_object(firstPart)
-            Ks = ThreeDES.generate_key()
-            string = Ks.decode('utf-8', errors='ignore')
-            PUEncrypt = RSA.import_public_key(podaci1[3])
-            self.PRDecrypt1 = podaci1[3]  # KeyId od publik za ovaj PK,tj njegov mejl da bi se importovao njegov PK za dekripciju
-            encryption = RSA.encrypt_message(str(Ks), PUEncrypt)  # KLJUC
-            symetricEncryption = ThreeDES.encrypt(Zipped, Ks)  # TEXT
-            self.bytes1 = (len(encryption))
-            self.bytes2 = (len(symetricEncryption))
-            porukaZaSlanje = (symetricEncryption, encryption)
-            self.poruka = ZIP.tuple_to_radix64(porukaZaSlanje)
-            print("Poslata poruka")
+            password = self.loz1.get()
+
+            if RSA.import_private_key(podaci[4], password) == 404:  #proba da importuje RSA ako nema radi DSA/ElGamal
+                print("Triple")
+                hashed = sha1_hash(self.porukazas)
+                #password = self.loz1.get()
+                #podaci = self.izaberiKljuc()
+                podaci1 = self.izaberiKljuc1()
+                self.PKSign = DSA.import_private_key(podaci[4])
+                signature = DSA.sign_message(hashed, self.PKSign)
+                firstPart = (signature, self.porukazas)
+                Zipped = ZIP.zip_object(firstPart)
+                Ks = ThreeDES.generate_key()
+                string = Ks.decode('utf-8', errors='ignore')
+                PUEncrypt = ElGamal.import_public_elgamal_keys_from_pem(podaci1[3])
+                self.PRDecrypt1 = podaci1[3]  # KeyId od publik za ovaj PK,tj njegov mejl da bi se importovao njegov PK za dekripciju
+                encryption = ElGamal.elgamal_encrypt(str(Ks), PUEncrypt)  # KLJUC
+                symetricEncryption = ThreeDES.encrypt(Zipped, Ks)  # TEXT
+                self.bytes1 = (len(encryption))
+                self.bytes2 = (len(symetricEncryption))
+                porukaZaSlanje = (symetricEncryption, encryption)
+                self.poruka = ZIP.tuple_to_radix64(porukaZaSlanje)
+                print("Poslata poruka")
+            else:
+                hashed = sha1_hash(self.porukazas)
+                #password = self.loz1.get()
+                #podaci = self.izaberiKljuc()
+                podaci1 = self.izaberiKljuc1()
+                self.PKSign = RSA.import_private_key(podaci[4], password)  # teba da se doda pasvord da se salje
+                signature = RSA.sign_message(hashed, self.PKSign)
+                firstPart = (signature, self.porukazas)
+                Zipped = ZIP.zip_object(firstPart)
+                Ks = ThreeDES.generate_key()
+                string = Ks.decode('utf-8', errors='ignore')
+                PUEncrypt = RSA.import_public_key(podaci1[3])
+                self.PRDecrypt1 = podaci1[3]  # KeyId od publik za ovaj PK,tj njegov mejl da bi se importovao njegov PK za dekripciju
+                encryption = RSA.encrypt_message(str(Ks), PUEncrypt)  # KLJUC
+                symetricEncryption = ThreeDES.encrypt(Zipped, Ks)  # TEXT
+                self.bytes1 = (len(encryption))
+                self.bytes2 = (len(symetricEncryption))
+                porukaZaSlanje = (symetricEncryption, encryption)
+                self.poruka = ZIP.tuple_to_radix64(porukaZaSlanje)
+                print("Poslata poruka")
 
         else:
-            hashed = sha1_hash(self.porukazas)
-            password = self.loz1.get()
             podaci = self.izaberiKljuc()
-            podaci1 = self.izaberiKljuc1()
-            self.PKSign = RSA.import_private_key(podaci[4], password) #teba da se doda pasvord da se salje
-            signature = RSA.sign_message(hashed, self.PKSign)
-            firstPart = (signature, self.porukazas)
-            Zipped = ZIP.zip_object(firstPart)
-            Ks = AES.generate_key()
-            string = Ks.decode('utf-8', errors='ignore')
-            PUEncrypt = RSA.import_public_key(podaci1[3])
-            self.PRDecrypt1 = podaci1[3]  # KeyId od publik za ovaj PK,tj njegov mejl da bi se importovao njegov PK za dekripciju
-            encryption = RSA.encrypt_message(str(Ks), PUEncrypt)  # KLJUC
-            symetricEncryption = AES.encrypt(Zipped, Ks)  # TEXT
-            self.bytes1 = (len(encryption))
-            self.bytes2 = (len(symetricEncryption))
-            porukaZaSlanje = (symetricEncryption, encryption)
-            self.poruka = ZIP.tuple_to_radix64(porukaZaSlanje)
-            print("Poslata poruka")
+            password = self.loz1.get()
+            if RSA.import_private_key(podaci[4], password) == 404: #proba da importuje RSA ako nema radi DSA/ElGamal
+                hashed = sha1_hash(self.porukazas)
+                #password = self.loz1.get()
+                #podaci = self.izaberiKljuc()
+                podaci1 = self.izaberiKljuc1()
+                self.PKSign = DSA.import_private_key(podaci[4])  # teba da se doda pasvord da se salje
+                signature = DSA.sign_message(hashed, self.PKSign)
+                firstPart = (signature, self.porukazas)
+                Zipped = ZIP.zip_object(firstPart)
+                Ks = AES.generate_key()
+                string = Ks.decode('utf-8', errors='ignore')
+                PUEncrypt = ElGamal.import_public_elgamal_keys_from_pem(podaci1[3])
+                self.PRDecrypt1 = podaci1[
+                    3]  # KeyId od publik za ovaj PK,tj njegov mejl da bi se importovao njegov PK za dekripciju
+                encryption = ElGamal.elgamal_encrypt(str(Ks), PUEncrypt)  # KLJUC
+                symetricEncryption = AES.encrypt(Zipped, Ks)  # TEXT
+                self.bytes1 = (len(encryption))
+                self.bytes2 = (len(symetricEncryption))
+                porukaZaSlanje = (symetricEncryption, encryption)
+                self.poruka = ZIP.tuple_to_radix64(porukaZaSlanje)
+                print("Poslata poruka")
+            else:
+                hashed = sha1_hash(self.porukazas)
+                #password = self.loz1.get()
+                #podaci = self.izaberiKljuc()
+                podaci1 = self.izaberiKljuc1()
+                self.PKSign = RSA.import_private_key(podaci[4], password) #teba da se doda pasvord da se salje
+                signature = RSA.sign_message(hashed, self.PKSign)
+                firstPart = (signature, self.porukazas)
+                Zipped = ZIP.zip_object(firstPart)
+                Ks = AES.generate_key()
+                string = Ks.decode('utf-8', errors='ignore')
+                PUEncrypt = RSA.import_public_key(podaci1[3])
+                self.PRDecrypt1 = podaci1[3]  # KeyId od publik za ovaj PK,tj njegov mejl da bi se importovao njegov PK za dekripciju
+                encryption = RSA.encrypt_message(str(Ks), PUEncrypt)  # KLJUC
+                symetricEncryption = AES.encrypt(Zipped, Ks)  # TEXT
+                self.bytes1 = (len(encryption))
+                self.bytes2 = (len(symetricEncryption))
+                porukaZaSlanje = (symetricEncryption, encryption)
+                self.poruka = ZIP.tuple_to_radix64(porukaZaSlanje)
+                print("Poslata poruka")
 
     def sacuvajKljuc(self):
         #self.refreshTable1()
@@ -317,7 +366,7 @@ class App(ctk.CTk):
 
     def obrisiKljuc1(self):
         selectedRow = self.PUTabela.selection()[0]
-        values = self.PKTabela.item(selectedRow, 'values')
+        values = self.PUTabela.item(selectedRow, 'values')
         print(values)
         for i in publicKeyRing:
             if int(values[1]) == int(i[1]):
@@ -364,50 +413,6 @@ class App(ctk.CTk):
         for row in publicKeyRing:
             self.PUTabela.insert('', 'end', values=row)
 
-    #salje za DSA/EL
-    def salji1(self):
-        if self.algoVar1.get() == 0: #ovo je za TripleDes
-            print("Triple")
-            hashed = sha1_hash(self.porukazas)
-            password = self.loz1.get()
-            podaci = self.izaberiKljuc()
-            podaci1 = self.izaberiKljuc1()
-            self.PKSign = DSA.import_private_key(podaci[4])
-            signature = DSA.sign_message(hashed, self.PKSign)
-            firstPart = (signature, self.porukazas)
-            Zipped = ZIP.zip_object(firstPart)
-            Ks = ThreeDES.generate_key()
-            string = Ks.decode('utf-8', errors='ignore')
-            PUEncrypt = ElGamal.import_public_elgamal_keys_from_pem(podaci1[3])
-            self.PRDecrypt1 = podaci1[3]  # KeyId od publik za ovaj PK,tj njegov mejl da bi se importovao njegov PK za dekripciju
-            encryption = ElGamal.elgamal_encrypt(str(Ks), PUEncrypt)  # KLJUC
-            symetricEncryption = ThreeDES.encrypt(Zipped, Ks)  # TEXT
-            self.bytes1 = (len(encryption))
-            self.bytes2 = (len(symetricEncryption))
-            porukaZaSlanje = (symetricEncryption, encryption)
-            self.poruka = ZIP.tuple_to_radix64(porukaZaSlanje)
-            print("Poslata poruka")
-
-        else:
-            hashed = sha1_hash(self.porukazas)
-            password = self.loz1.get()
-            podaci = self.izaberiKljuc()
-            podaci1 = self.izaberiKljuc1()
-            self.PKSign = DSA.import_private_key(podaci[4])  # teba da se doda pasvord da se salje
-            signature = DSA.sign_message(hashed, self.PKSign)
-            firstPart = (signature, self.porukazas)
-            Zipped = ZIP.zip_object(firstPart)
-            Ks = AES.generate_key()
-            string = Ks.decode('utf-8', errors='ignore')
-            PUEncrypt = ElGamal.import_public_elgamal_keys_from_pem(podaci1[3])
-            self.PRDecrypt1 = podaci1[3]  # KeyId od publik za ovaj PK,tj njegov mejl da bi se importovao njegov PK za dekripciju
-            encryption = ElGamal.elgamal_encrypt(str(Ks), PUEncrypt)  # KLJUC
-            symetricEncryption = AES.encrypt(Zipped, Ks)  # TEXT
-            self.bytes1 = (len(encryption))
-            self.bytes2 = (len(symetricEncryption))
-            porukaZaSlanje = (symetricEncryption, encryption)
-            self.poruka = ZIP.tuple_to_radix64(porukaZaSlanje)
-            print("Poslata poruka")
 
     #cuva poruku koja je dekriptovana za DSA/El
     def save_file1(self):

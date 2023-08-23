@@ -158,7 +158,7 @@ def import_private_key(email, password=None):
 
     if private_key_path is None:
         print("Private key file not found")
-        exit(1)
+        return 404  #promenjeno sa exit(1) da bi moglao da se uhvati return
 
     with open(private_key_path, "rb") as f:
         private_key_pem = f.read()

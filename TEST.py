@@ -108,8 +108,8 @@ class App(ctk.CTk):
         self.prijemFrame = ctk.CTkFrame(self.GlavniFrame, width=233, height=650)
         self.prijemFrame.grid(row=0, column=2, padx=20, pady=20, sticky="nsew")
 
-        self.PorukaD = ctk.CTkButton(self.prijemFrame, command=self.open_file, text="Izabrati Poruku za Dekripciju")
-        self.PorukaD.grid(row=3, column=0, padx=20, pady=10)
+        #self.PorukaD = ctk.CTkButton(self.prijemFrame, command=self.open_file, text="Izabrati Poruku za Dekripciju")   #zakomentarisano zato sto se poruka cuva u pozadini(self.poruka)
+        #self.PorukaD.grid(row=3, column=0, padx=20, pady=10)
 
         self.PutanjaCuvanja = ctk.CTkButton(self.prijemFrame, command=self.save_file, text="Izabrati Gde se cuva")
         self.PutanjaCuvanja.grid(row=4, column=0, padx=20, pady=10)
@@ -191,7 +191,7 @@ class App(ctk.CTk):
         else:
             print("Nije ucitan fajl")
 
-    #salje za RSA
+    #salje za RSA i DSA/ELGAMAL spojeno
     def salji(self):
         if self.algoVar1.get() == 0: #ovo je za TripleDes
             print("Triple")
@@ -301,36 +301,78 @@ class App(ctk.CTk):
                     otpakovano = ZIP.radix64_to_tuple(self.poruka, self.bytes2, self.bytes1)
                     symetricEncryptionOtpakovano = otpakovano[0]  # TEXT
                     encryptionOtpakovano = otpakovano[1]  # KLJUC
-                    PRDecrypt = RSA.import_private_key(self.PRDecrypt1, self.loz1.get())
-                    string1 = RSA.decrypt_message(encryptionOtpakovano, PRDecrypt)
-                    Ks1 = string1[2:-1]
-                    string2 = Ks1.decode("unicode_escape").replace("\\\\", "\\")
-                    Ks2 = string2.encode("latin1")
-                    decryption = ThreeDES.decrypt(symetricEncryptionOtpakovano, Ks2)
-                    Unzipped = ZIP.unzip_object(decryption)
-                    verifikacija = RSA.verify_signature(sha1_hash(Unzipped[1]), Unzipped[0], self.PKSign.public_key())
-                    hes = sha1_hash(Unzipped[1])
-                    if verifikacija == hes:
-                        print(Unzipped[1])
-                    file.write(Unzipped[1])
-                    print("Uspesno Sacuvana Poruka")
+
+                    if RSA.import_private_key(self.PRDecrypt1, self.loz1.get()) == 404:#ista fora kao za salji
+
+                        PRDecrypt = ElGamal.import_privte_elgamal_keys_from_pem(self.PRDecrypt1)
+                        string1 = ElGamal.elgamal_decrypt(encryptionOtpakovano, PRDecrypt)
+                        Ks1 = string1[2:-1]
+                        string2 = Ks1.decode("unicode_escape").replace("\\\\", "\\")
+                        Ks2 = string2.encode("latin1")
+                        decryption = ThreeDES.decrypt(symetricEncryptionOtpakovano, Ks2)
+                        Unzipped = ZIP.unzip_object(decryption)
+                        verifikacija = DSA.verify_signature(sha1_hash(Unzipped[1]), Unzipped[0],
+                                                            self.PKSign.public_key())
+                        hes = sha1_hash(Unzipped[1])
+                        if verifikacija == hes:
+                            print(Unzipped[1])
+                        file.write(Unzipped[1])
+                        print("Uspesno Sacuvana Poruka")
+
+                    else:
+                        PRDecrypt = RSA.import_private_key(self.PRDecrypt1, self.loz1.get())
+                        string1 = RSA.decrypt_message(encryptionOtpakovano, PRDecrypt)
+                        Ks1 = string1[2:-1]
+                        string2 = Ks1.decode("unicode_escape").replace("\\\\", "\\")
+                        Ks2 = string2.encode("latin1")
+                        decryption = ThreeDES.decrypt(symetricEncryptionOtpakovano, Ks2)
+                        Unzipped = ZIP.unzip_object(decryption)
+                        verifikacija = RSA.verify_signature(sha1_hash(Unzipped[1]), Unzipped[0],
+                                                            self.PKSign.public_key())
+                        hes = sha1_hash(Unzipped[1])
+                        if verifikacija == hes:
+                            print(Unzipped[1])
+                        file.write(Unzipped[1])
+                        print("Uspesno Sacuvana Poruka")
+
                 else:
                     otpakovano = ZIP.radix64_to_tuple(self.poruka, self.bytes2, self.bytes1)
                     symetricEncryptionOtpakovano = otpakovano[0]  # TEXT
                     encryptionOtpakovano = otpakovano[1]  # KLJUC
-                    PRDecrypt = RSA.import_private_key(self.PRDecrypt1, self.loz1.get())
-                    string1 = RSA.decrypt_message(encryptionOtpakovano, PRDecrypt)
-                    Ks1 = string1[2:-1]
-                    string2 = Ks1.decode("unicode_escape").replace("\\\\", "\\")
-                    Ks2 = string2.encode("latin1")
-                    decryption = AES.decrypt(symetricEncryptionOtpakovano, Ks2)
-                    Unzipped = ZIP.unzip_object(decryption)
-                    verifikacija = RSA.verify_signature(sha1_hash(Unzipped[1]), Unzipped[0], self.PKSign.public_key())
-                    hes = sha1_hash(Unzipped[1])
-                    if verifikacija == hes:
-                        print(Unzipped[1])
-                    file.write(Unzipped[1])
-                    print("Uspesno Sacuvana Poruka")
+
+                    if RSA.import_private_key(self.PRDecrypt1, self.loz1.get()) == 404:
+
+                        PRDecrypt = ElGamal.import_privte_elgamal_keys_from_pem(self.PRDecrypt1)
+                        string1 = ElGamal.elgamal_decrypt(encryptionOtpakovano, PRDecrypt)
+                        Ks1 = string1[2:-1]
+                        string2 = Ks1.decode("unicode_escape").replace("\\\\", "\\")
+                        Ks2 = string2.encode("latin1")
+                        decryption = AES.decrypt(symetricEncryptionOtpakovano, Ks2)
+                        Unzipped = ZIP.unzip_object(decryption)
+                        verifikacija = DSA.verify_signature(sha1_hash(Unzipped[1]), Unzipped[0],
+                                                            self.PKSign.public_key())
+                        hes = sha1_hash(Unzipped[1])
+                        if verifikacija == hes:
+                            print(Unzipped[1])
+                        file.write(Unzipped[1])
+                        print("Uspesno Sacuvana Poruka")
+
+                    else:
+
+                        PRDecrypt = RSA.import_private_key(self.PRDecrypt1, self.loz1.get())
+                        string1 = RSA.decrypt_message(encryptionOtpakovano, PRDecrypt)
+                        Ks1 = string1[2:-1]
+                        string2 = Ks1.decode("unicode_escape").replace("\\\\", "\\")
+                        Ks2 = string2.encode("latin1")
+                        decryption = AES.decrypt(symetricEncryptionOtpakovano, Ks2)
+                        Unzipped = ZIP.unzip_object(decryption)
+                        verifikacija = RSA.verify_signature(sha1_hash(Unzipped[1]), Unzipped[0],
+                                                            self.PKSign.public_key())
+                        hes = sha1_hash(Unzipped[1])
+                        if verifikacija == hes:
+                            print(Unzipped[1])
+                        file.write(Unzipped[1])
+                        print("Uspesno Sacuvana Poruka")
 
         else:
             print("Nije selektovan fajl")
@@ -412,53 +454,6 @@ class App(ctk.CTk):
 
         for row in publicKeyRing:
             self.PUTabela.insert('', 'end', values=row)
-
-
-    #cuva poruku koja je dekriptovana za DSA/El
-    def save_file1(self):
-        filepath1 = filedialog.asksaveasfilename(filetypes=(("Text files", "*.txt"), ("All files", "*.*")))
-        print(filepath1)
-        if filepath1:
-            with open(filepath1, 'w') as file:
-                if self.algoVar1.get() == 0:  # ovo je za TripleDes
-                    print("Triple")
-                    otpakovano = ZIP.radix64_to_tuple(self.poruka, self.bytes2, self.bytes1)
-                    symetricEncryptionOtpakovano = otpakovano[0]  # TEXT
-                    encryptionOtpakovano = otpakovano[1]  # KLJUC
-                    PRDecrypt = ElGamal.import_privte_elgamal_keys_from_pem(self.PRDecrypt1)
-                    string1 = ElGamal.elgamal_decrypt(encryptionOtpakovano, PRDecrypt)
-                    Ks1 = string1[2:-1]
-                    string2 = Ks1.decode("unicode_escape").replace("\\\\", "\\")
-                    Ks2 = string2.encode("latin1")
-                    decryption = ThreeDES.decrypt(symetricEncryptionOtpakovano, Ks2)
-                    Unzipped = ZIP.unzip_object(decryption)
-                    verifikacija = DSA.verify_signature(sha1_hash(Unzipped[1]), Unzipped[0], self.PKSign.public_key())
-                    hes = sha1_hash(Unzipped[1])
-                    if verifikacija == hes:
-                        print(Unzipped[1])
-                    file.write(Unzipped[1])
-                    print("Uspesno Sacuvana Poruka")
-                else:
-                    otpakovano = ZIP.radix64_to_tuple(self.poruka, self.bytes2, self.bytes1)
-                    symetricEncryptionOtpakovano = otpakovano[0]  # TEXT
-                    encryptionOtpakovano = otpakovano[1]  # KLJUC
-                    PRDecrypt = ElGamal.import_privte_elgamal_keys_from_pem(self.PRDecrypt1)
-                    string1 = ElGamal.elgamal_decrypt(encryptionOtpakovano, PRDecrypt)
-                    Ks1 = string1[2:-1]
-                    string2 = Ks1.decode("unicode_escape").replace("\\\\", "\\")
-                    Ks2 = string2.encode("latin1")
-                    decryption = AES.decrypt(symetricEncryptionOtpakovano, Ks2)
-                    Unzipped = ZIP.unzip_object(decryption)
-                    verifikacija = DSA.verify_signature(sha1_hash(Unzipped[1]), Unzipped[0], self.PKSign.public_key())
-                    hes = sha1_hash(Unzipped[1])
-                    if verifikacija == hes:
-                        print(Unzipped[1])
-                    file.write(Unzipped[1])
-                    print("Uspesno Sacuvana Poruka")
-
-        else:
-            print("Nije selektovan fajl")
-
 
 
 if __name__ == "__main__":

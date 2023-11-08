@@ -64,6 +64,7 @@ def generate_elgamal_keys(name, email, key_size, password=None):
 def import_privte_elgamal_keys_from_pem(email):
     pattern = re.compile(r"\w+\s\w+" + re.escape(email) +
                          r"_private_key_elgamal_\d{4}_\d{4}-\d{2}-\d{2}_\d{2}_\d{2}_\d{2}.pem")
+
     private_key_path = None
 
     for filename in os.listdir("Kljucevi"):
@@ -89,6 +90,7 @@ def import_privte_elgamal_keys_from_pem(email):
 def import_public_elgamal_keys_from_pem(email):
     pattern = re.compile(
         r"\w+\s\w+" + re.escape(email) + r"_public_key_elgamal_\d{4}_\d{4}-\d{2}-\d{2}_\d{2}_\d{2}_\d{2}.pem")
+
     public_key_path = None
 
     for filename in os.listdir("Kljucevi"):
@@ -153,6 +155,7 @@ def elgamal_decrypt(ciphertext, private_key):
 #
 # PR = import_privte_elgamal_keys_from_pem("Nemdsa@gmail.com")
 # PU = import_public_elgamal_keys_from_pem("Nemdsa@gmail.com")
+
 #
 # plaintext = 42
 #

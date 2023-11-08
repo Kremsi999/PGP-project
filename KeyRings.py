@@ -24,6 +24,7 @@ def generatePrivateRing(email, password=None):
     ruta4 = re.compile(
         r"\w+\s\w+" + re.escape(email) + r"_private_key_dsa_\w{1}_\d{4}_\d{4}-\d{2}-\d{2}_\d{2}_\d{2}_\d{2}.pem")
 
+
     #ovde iteriram kroz folder
     for filename in os.listdir("Kljucevi"):
         HasPass = ""
@@ -116,12 +117,10 @@ def generatePublicRing():
                         backend=default_backend()
                     )
                     print("Public key imported")
-
             except ValueError:
                 print("Error")
                 exit(1)
             #Ovde je sve ok sto se tice parametara nzm da li mi treba jos neki jer ne radimo poverenje
-
             if pattern2.match(filename):
                 KeyID = int(public_key.y)
                 KeyID = KeyID & ((1 << 64) - 1)
@@ -135,6 +134,7 @@ def generatePublicRing():
                 key = (datetime_str, KeyID, public_key.public_bytes(encoding=serialization.Encoding.PEM,
                                                               format=serialization.PublicFormat.SubjectPublicKeyInfo),UserID)
                 publicKeyRing.append(key)
+
 
 #testiranje funkcija
 # generatePrivateRing("nemanjakrcmar.nk@gmail.com")

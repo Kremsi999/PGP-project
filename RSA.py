@@ -33,6 +33,7 @@ def generate_rsa_keys(name, email, key_size, password=None):
             )
         #timestap pise ti
         timestamp = datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
+
         #Kako se cuvaju
         if password:
             with open(f'Kljucevi/{name}_{email}_private_key_rsa_E_{key_size}_{timestamp}.pem', 'wb') as f:
@@ -151,6 +152,7 @@ def import_private_key(email, password=None):
     pattern1 = re.compile(r"\w+\s\w+" + re.escape(email) +
                           r"_private_key_rsa_\w{1}_\d{4}_\d{4}-\d{2}-\d{2}_\d{2}_\d{2}_\d{2}.pem")
 
+
     for filename in os.listdir("Kljucevi"):
         if pattern.match(filename) or pattern1.match(filename):
             private_key_path = os.path.join("Kljucevi", filename)
@@ -207,6 +209,7 @@ def import_public_key(email):
     public_key_path = None
     pattern1 = re.compile(r"\w+\s\w+" + re.escape(email) +
                           r"_public_key_rsa_\w{1}_\d{4}_\d{4}-\d{2}-\d{2}_\d{2}_\d{2}_\d{2}.pem")
+
 
     for filename in os.listdir("Kljucevi"):
         if pattern.match(filename) or pattern1.match(filename):

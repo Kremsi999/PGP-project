@@ -1,5 +1,6 @@
 import pickle
 import struct
+
 import tkinter as tk
 from tkinter import ttk
 
@@ -32,6 +33,7 @@ class App(ctk.CTk):
         self.title("ZP Projekat 2023")
         self.geometry(f"{1200}x{900}")
         #self.attributes("-fullscreen", True)
+
 
         #self.grid_columnconfigure(0, weight=1)
         #self.grid_columnconfigure(1, weight=1)
@@ -113,6 +115,7 @@ class App(ctk.CTk):
         #self.PorukaD = ctk.CTkButton(self.prijemFrame, command=self.open_file, text="Izabrati Poruku za Dekripciju")   #zakomentarisano zato sto se poruka cuva u pozadini(self.poruka)
         #self.PorukaD.grid(row=3, column=0, padx=20, pady=10)
 
+
         self.PutanjaCuvanja = ctk.CTkButton(self.prijemFrame, command=self.save_file, text="Izabrati Gde se cuva")
         self.PutanjaCuvanja.grid(row=4, column=0, padx=20, pady=10)
         #Glavni za tabele
@@ -171,6 +174,7 @@ class App(ctk.CTk):
         self.DugmadiFrame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
         self.IzaberiPKBtn = ctk.CTkButton(self.DugmadiFrame, text="Izaberi Kljuc", command=self.izaberiKljuc1)
         self.ObrisiPKBtn = ctk.CTkButton(self.DugmadiFrame, text="Obrisi Kljuc", command=self.obrisiKljuc1)
+
         # Stavi u frame
         self.PUTabela.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
         self.IzaberiPKBtn.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
@@ -465,7 +469,6 @@ class App(ctk.CTk):
 
         for row in publicKeyRing:
             self.PUTabela.insert('', 'end', values=row)
-
 
 if __name__ == "__main__":
     app = App()

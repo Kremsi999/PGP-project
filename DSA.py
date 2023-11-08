@@ -33,6 +33,7 @@ def generate_dsa_keys(name, email, key_size, password=None):
 
         timestamp = datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
 
+
         if password:
             with open(f'Kljucevi/{name}_{email}_private_key_dsa_E_{key_size}_{timestamp}.pem', 'wb') as f:
                 f.write(pem)
@@ -89,6 +90,7 @@ def sign_message(message, private_key):
 
 
 def verify_signature(message, signature, public_key):
+
     try:
         public_key.verify(
             signature,
@@ -125,6 +127,7 @@ def import_private_key(email, password=None):
     datetime_str = re.findall(r"\d{4}-\d{2}-\d{2}_\d{2}_\d{2}_\d{2}", private_key_path)
     if datetime_str:
         datetime_obj = datetime.strptime(datetime_str[0], "%Y-%m-%d_%H_%M_%S")
+
         print("Parsed datetime object:", datetime_obj)
     else:
         print("Datetime not found in filename.")
